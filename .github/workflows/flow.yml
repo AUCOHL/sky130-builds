@@ -26,6 +26,10 @@ jobs:
       run: |
         echo ${{ github.token }} | gh auth login --with-token
         gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }} || echo "GO_AHEAD=1" >> $GITHUB_ENV
+    - name: Write PDK Root
+      if: ${{ env.GO_AHEAD == '1' }}
+      run: |
+        echo "PDK_ROOT=/usr/local/pdk" >> $GITHUB_ENV
     - name: Build PDK
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
@@ -33,7 +37,7 @@ jobs:
     - name: Compress PDK
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
-        tar -cf /tmp/sky130A.tar -C ./pdks/sky130A .
+        tar -cf /tmp/sky130A.tar -C /usr/local/pdk/sky130A .
         xz -zk /tmp/sky130A.tar
     - name: Upload artifact
       if: ${{ env.GO_AHEAD == '1' }}
