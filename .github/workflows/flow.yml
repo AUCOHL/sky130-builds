@@ -1,0 +1,44 @@
+name: Prebuild Sky130
+on:
+  workflow_dispatch:
+  schedule:
+    - 0 0 * * *
+jobs:
+  prebuild:
+    name: Prebuild Sky130
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Get Metadata
+      run: |
+        echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
+        echo "REPO=$(${{ github.repository }} | cut -d/ -f2 | tr -d '\n'}})" >> $GITHUB_ENV
+    - name: Checkout OpenLane
+      uses: actions/checkout@v2
+      with:
+        repository: https://github.com/The-OpenROAD-Project/OpenLane
+    - name: Get tag name
+      run: |
+        SKYWATER_COMMIT=$(python3 ./dependencies/tool.py sky130 -f commit)
+        OPEN_PDKS_COMMIT=$(python3 ./dependencies/tool.py open_pdks -f commit)
+        echo "TAG_NAME=$SKYWATER_COMMIT-$OPEN_PDKS_COMMIT" >> $GITHUB_ENV
+    - name: Check if release exists
+      run: |
+        gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }}
+        if [[ $? == "1" ]]; then
+          echo "GO_AHEAD=1" >> $GITHUB_ENV
+        fi
+    - name: Build PDK
+      if: ${{ env.GO_AHEAD == '1' }}
+      run: |
+        make pdk
+    - name: Compress PDK
+      if: ${{ env.GO_AHEAD == '1' }}
+      run: |
+        tar -cf /tmp/sky130A.tar -C ./pdks/sky130A .
+        xz -zk /tmp/sky130A.tar
+    - name: Upload artifact
+      if: ${{ env.GO_AHEAD == '1' }}
+      run:
+          go get -u github.com/tcnksm/ghr
+          export PATH=$PATH:$(go env GOPATH)/bin
+          ghr -u ${{ env.OWNER }} -r ${{ env.REPO }} -t ${{ github.token }} ${{ env.TAG_NAME }} /tmp/sky130A.tar.xz

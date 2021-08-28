@@ -1,0 +1,1 @@
+This repo builds sky130A using OpenLane, creates an xzipped tarball, then uploads it as a GitHub release artifact.
