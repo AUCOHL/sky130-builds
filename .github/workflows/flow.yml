@@ -11,11 +11,11 @@ jobs:
     - name: Get Metadata
       run: |
         echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
-        echo "REPO=$(${{ github.repository }} | cut -d/ -f2 | tr -d '\n'}})" >> $GITHUB_ENV
+        echo "REPO=$(${{ github.repository }} | cut -d/ -f2 | tr -d '\n')" >> $GITHUB_ENV
     - name: Checkout OpenLane
       uses: actions/checkout@v2
       with:
-        repository: https://github.com/The-OpenROAD-Project/OpenLane
+        repository: The-OpenROAD-Project/OpenLane
     - name: Get tag name
       run: |
         SKYWATER_COMMIT=$(python3 ./dependencies/tool.py sky130 -f commit)
