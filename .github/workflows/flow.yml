@@ -2,7 +2,7 @@ name: Prebuild Sky130
 on:
   workflow_dispatch:
   schedule:
-    - 0 0 * * *
+    - cron: '0 0 * * *'
 jobs:
   prebuild:
     name: Prebuild Sky130
