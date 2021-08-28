@@ -11,7 +11,7 @@ jobs:
     - name: Get Metadata
       run: |
         echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
-        echo "REPO=$(${{ github.repository }} | cut -d/ -f2 | tr -d '\n')" >> $GITHUB_ENV
+        echo "REPO=$(echo ${{ github.repository }} | cut -d/ -f2 | tr -d '\n')" >> $GITHUB_ENV
     - name: Checkout OpenLane
       uses: actions/checkout@v2
       with:
@@ -23,7 +23,7 @@ jobs:
         echo "TAG_NAME=$SKYWATER_COMMIT-$OPEN_PDKS_COMMIT" >> $GITHUB_ENV
     - name: Check if release exists
       run: |
-        gh auth login --with-token ${{ github.token }}
+        echo ${{ github.token }} | gh auth login --with-token
         gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }}
         if [[ $? == "1" ]]; then
           echo "GO_AHEAD=1" >> $GITHUB_ENV
