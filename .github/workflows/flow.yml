@@ -24,10 +24,7 @@ jobs:
     - name: Check if release exists
       run: |
         echo ${{ github.token }} | gh auth login --with-token
-        gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }}
-        if [[ $? == "1" ]]; then
-          echo "GO_AHEAD=1" >> $GITHUB_ENV
-        fi
+        gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }} || echo "GO_AHEAD=1" >> $GITHUB_ENV
     - name: Build PDK
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
