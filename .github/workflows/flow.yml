@@ -30,6 +30,8 @@ jobs:
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
         echo "PDK_ROOT=/usr/local/pdk" >> $GITHUB_ENV
+        sudo mkdir -p /usr/local/pdk
+        sudo chown $USER:$USER /usr/local/pdk
     - name: Build PDK
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
