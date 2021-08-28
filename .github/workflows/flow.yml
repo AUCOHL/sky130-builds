@@ -16,6 +16,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: The-OpenROAD-Project/OpenLane
+        depth: 0
     - name: Get tag name
       run: |
         SKYWATER_COMMIT=$(python3 ./dependencies/tool.py sky130 -f commit)
