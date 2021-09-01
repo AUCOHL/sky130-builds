@@ -28,23 +28,23 @@ jobs:
         echo ${{ github.token }} | gh auth login --with-token
         echo "EXISTS=$(gh api repos/${{ github.repository }}/releases | jq '.[].tag_name' | grep -c ${{ env.TAG_NAME }} | tr -d '\n')" >> $GITHUB_ENV
     - name: Write PDK Root
-      if: ${{ env.EXISTS != '1' }}
+      if: ${{ env.EXISTS == '0' }}
       run: |
         echo "PDK_ROOT=/usr/local/pdk" >> $GITHUB_ENV
         sudo mkdir -p /usr/local/pdk
         sudo chown $USER:$USER /usr/local/pdk
     - name: Build PDK
-      if: ${{ env.EXISTS != '1' }}
+      if: ${{ env.EXISTS == '0' }}
       run: |
         make pdk
     - name: Compress PDK
-      if: ${{ env.EXISTS != '1' }}
+      if: ${{ env.EXISTS == '0' }}
       run: |
         sudo apt-get install -y pv
         tar -cf /tmp/sky130A.tar -C /usr/local/pdk/sky130A .
         pv /tmp/sky130A.tar | xz > /tmp/sky130A.tar.xz
     - name: Upload artifact
-      if: ${{ env.EXISTS != '1' }}
+      if: ${{ env.EXISTS == '0' }}
       run: |
         go get -u github.com/tcnksm/ghr
         export PATH=$PATH:$(go env GOPATH)/bin
