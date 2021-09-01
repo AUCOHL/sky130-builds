@@ -24,8 +24,9 @@ jobs:
         echo "TAG_NAME=$SKYWATER_COMMIT-$OPEN_PDKS_COMMIT" >> $GITHUB_ENV
     - name: Check if release exists
       run: |
+        sudo apt-get install -y jq
         echo ${{ github.token }} | gh auth login --with-token
-        gh api repos/${{ github.repository }}/releases/${{ env.TAG_NAME }} || echo "GO_AHEAD=1" >> $GITHUB_ENV
+        echo "GO_AHEAD=$(gh api repos/${{ github.repository }}/releases | jq '.[].tag_name' | grep -c ${{ env.TAG_NAME }} | tr -d '\n')" >> $GITHUB_ENV
     - name: Write PDK Root
       if: ${{ env.GO_AHEAD == '1' }}
       run: |
