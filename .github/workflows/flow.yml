@@ -48,4 +48,10 @@ jobs:
       run: |
         go get -u github.com/tcnksm/ghr
         export PATH=$PATH:$(go env GOPATH)/bin
-        ghr -u ${{ env.OWNER }} -r ${{ env.REPO }} -t ${{ github.token }} ${{ env.TAG_NAME }} /tmp/sky130A.tar.xz
+        ghr\
+          -u ${{ env.OWNER }}\
+          -r ${{ env.REPO }}\
+          -t ${{ github.token }}\
+          -b "Automated release at $(date -u)"\
+          ${{ env.TAG_NAME }}\
+          /tmp/sky130A.tar.xz

@@ -13,6 +13,18 @@ sudo chown $USER:$USER /usr/local/pdk/sky130A
 tar -xJf ./sky130A.tar.xz -C /usr/local/pdk/sky130A
 ```
 
+# Get PDK Script
+If you'd rather not deal with the hassle of figuring out the proper tarball, you can use the `get_pdk` script in the OpenLane root directory to automatically download and unpack the prebuilt PDK.
+
+Requires Ruby.
+
+```sh
+# Assuming you have ~/bin in PATH
+mkdir -p ~/bin 
+curl -L https://raw.githubusercontent.com/Cloud-V/sky130-builds/main/get_pdk > ~/bin/get_pdk
+chmod +x ~/bin/get_pdk
+```
+
 # License & Acknowledgements
 ©2021 The American University in Cairo & The Cloud V Project
 

@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+if not File.exist?("./dependencies/tool.py")
+    STDERR.puts "[ERROR] #{$0} must be run from the OpenLane root directory."
+    exit 64
+end
+
+def run(cmd)
+    puts "$ #{cmd}"
+    system cmd
+end
+
+
+sky130_hash = `python3 ./dependencies/tool.py sky130 -f commit`
+opdks_hash = `python3 ./dependencies/tool.py open_pdks -f commit`
+
+run "curl -L 'https://github.com/Cloud-V/sky130-builds/releases/download/#{sky130_hash}-#{opdks_hash}/sky130A.tar.xz' > /usr/local/pdk/sky130A.tar.xz"
+run "mkdir -p /usr/local/pdk/sky130A"
+run "tar -xJvf /usr/local/pdk/sky130A.tar.xz -C /usr/local/pdk/sky130A"
