@@ -2,56 +2,65 @@ name: Prebuild Sky130
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 jobs:
   prebuild:
     name: Prebuild Sky130
     runs-on: ubuntu-20.04
     steps:
-    - name: Get Metadata
-      run: |
-        echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
-        echo "REPO=$(echo ${{ github.repository }} | cut -d/ -f2 | tr -d '\n')" >> $GITHUB_ENV
-    - name: Checkout OpenLane
-      uses: actions/checkout@v2
-      with:
-        repository: The-OpenROAD-Project/OpenLane
-        fetch-depth: 0
-    - name: Get tag name
-      run: |
-        SKYWATER_COMMIT=$(python3 ./dependencies/tool.py sky130 -f commit)
-        OPEN_PDKS_COMMIT=$(python3 ./dependencies/tool.py open_pdks -f commit)
-        echo "TAG_NAME=$SKYWATER_COMMIT-$OPEN_PDKS_COMMIT" >> $GITHUB_ENV
-    - name: Check if release exists
-      run: |
-        sudo apt-get install -y jq
-        echo ${{ github.token }} | gh auth login --with-token
-        echo "EXISTS=$(gh api repos/${{ github.repository }}/releases | jq '.[].tag_name' | grep -c ${{ env.TAG_NAME }} | tr -d '\n')" >> $GITHUB_ENV
-    - name: Write PDK Root
-      if: ${{ env.EXISTS == '0' }}
-      run: |
-        echo "PDK_ROOT=/usr/local/pdk" >> $GITHUB_ENV
-        sudo mkdir -p /usr/local/pdk
-        sudo chown $USER:$USER /usr/local/pdk
-    - name: Build PDK
-      if: ${{ env.EXISTS == '0' }}
-      run: |
-        make pdk
-    - name: Compress PDK
-      if: ${{ env.EXISTS == '0' }}
-      run: |
-        sudo apt-get install -y pv
-        tar -cf /tmp/sky130A.tar -C /usr/local/pdk/sky130A .
-        pv /tmp/sky130A.tar | xz > /tmp/sky130A.tar.xz
-    - name: Upload artifact
-      if: ${{ env.EXISTS == '0' }}
-      run: |
-        go get -u github.com/tcnksm/ghr
-        export PATH=$PATH:$(go env GOPATH)/bin
-        ghr\
-          -u ${{ env.OWNER }}\
-          -r ${{ env.REPO }}\
-          -t ${{ github.token }}\
-          -b "Automated release at $(date -u)"\
-          ${{ env.TAG_NAME }}\
-          /tmp/sky130A.tar.xz
+      - name: Get Metadata
+        run: |
+          echo "OWNER=${{ github.repository_owner }}" >> $GITHUB_ENV
+          echo "REPO=$(echo ${{ github.repository }} | cut -d/ -f2 | tr -d '\n')" >> $GITHUB_ENV
+      - name: Checkout OpenLane
+        uses: actions/checkout@v2
+        with:
+          repository: The-OpenROAD-Project/OpenLane
+          fetch-depth: 0
+      - name: Get tag name
+        run: |
+          SKYWATER_COMMIT=$(python3 ./dependencies/tool.py sky130 -f commit)
+          OPEN_PDKS_COMMIT=$(python3 ./dependencies/tool.py open_pdks -f commit)
+          echo "TAG_NAME=$SKYWATER_COMMIT-$OPEN_PDKS_COMMIT" >> $GITHUB_ENV
+      - name: Check if release exists
+        run: |
+          sudo apt-get install -y jq
+          echo ${{ github.token }} | gh auth login --with-token
+          echo "EXISTS=$(gh api repos/${{ github.repository }}/releases | jq '.[].tag_name' | grep -c ${{ env.TAG_NAME }} | tr -d '\n')" >> $GITHUB_ENV
+      - name: Write PDK Root
+        if: ${{ env.EXISTS == '0' }}
+        run: |
+          echo "PDK_ROOT=/usr/local/pdk" >> $GITHUB_ENV
+          sudo mkdir -p /usr/local/pdk
+          sudo chown $USER:$USER /usr/local/pdk
+      - name: Build PDK
+        if: ${{ env.EXISTS == '0' }}
+        run: |
+          make pdk
+      - name: Compress PDKs
+        if: ${{ env.EXISTS == '0' }}
+        run: |
+          sudo apt-get install -y pv
+          tar -cf /tmp/sky130A.tar -C /usr/local/pdk/sky130A .
+          pv /tmp/sky130A.tar | xz > /tmp/sky130A.tar.xz
+          tar -cf /tmp/sky130B.tar -C /usr/local/pdk/sky130B .
+          pv /tmp/sky130B.tar | xz > /tmp/sky130B.tar.xz
+      - name: Upload artifact
+        if: ${{ env.EXISTS == '0' }}
+        run: |
+          go get -u github.com/tcnksm/ghr
+          export PATH=$PATH:$(go env GOPATH)/bin
+          ghr\
+            -u ${{ env.OWNER }}\
+            -r ${{ env.REPO }}\
+            -t ${{ github.token }}\
+            -b "Automated release at $(date -u)"\
+            ${{ env.TAG_NAME }}\
+            /tmp/sky130A.tar.xz
+          ghr\
+            -u ${{ env.OWNER }}\
+            -r ${{ env.REPO }}\
+            -t ${{ github.token }}\
+            -b "Automated release at $(date -u)"\
+            ${{ env.TAG_NAME }}\
+            /tmp/sky130B.tar.xz
