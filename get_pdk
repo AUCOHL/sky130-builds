@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
-# Copyright ©2020-2021 The American University in Cairo and the Cloud V Project.
+# Copyright ©2020-2022 The American University in Cairo and the Cloud V Project.
 #
 # This file is part of the DFFRAM Memory Compiler.
 # See https://github.com/Cloud-V/DFFRAM for further info.
@@ -26,9 +26,10 @@ import subprocess
 
 try:
     import click
-    import yaml
 except ImportError:
-    print("You need to install click and pyyaml: python3 -m pip install click pyyaml")
+    print(
+        "You need to install click and pyyaml: python3 -m pip install 'click>7' pyyaml"
+    )
     exit(os.EX_CONFIG)
 
 
@@ -78,6 +79,8 @@ def main(tool_metadata_file_path, sky130_commit, open_pdks_commit, pdk_variant):
             exit(os.EX_USAGE)
 
     if sky130_commit is None and open_pdks_commit is None:
+        import yaml
+
         if tool_metadata_file_path is None:
             tool_metadata_file_path = os.path.join(".", "tool_metadata.yml")
             if not os.path.exists(tool_metadata_file_path):
@@ -88,7 +91,7 @@ def main(tool_metadata_file_path, sky130_commit, open_pdks_commit, pdk_variant):
                     print(
                         f"Any of ./tool_metadata.yml or ./dependencies/tool_metadata.yml not found. You'll need to specify the file path or the commits explicitly."
                     )
-                    exit(-1)
+                    exit(os.EX_USAGE)
 
         tool_metadata = yaml.safe_load(open(tool_metadata_file_path).read())
 
