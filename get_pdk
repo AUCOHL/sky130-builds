@@ -55,7 +55,7 @@ def mkdirp(path):
     "-P",
     "--open_pdks-commit",
     default=None,
-    help="Explicitly define a sky130 commit",
+    help="Explicitly define an open_pdks commit",
 )
 @click.option(
     "-v",

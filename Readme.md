@@ -1,9 +1,34 @@
 # Sky130 Builder
-This repo builds sky130A using OpenLane, creates an xzipped tarball, then uploads it as a GitHub release artifact.
+This repo builds sky130A and sky130B using OpenLane, creates an xzipped tarball, then uploads the results as GitHub release artifacts.
 
 # Requirements
 * Requires xzutils.
-* The files must be installed to `/usr/local/pdk/sky130A`.
+* The files must be installed to `/usr/local/pdk/sky130(A|B)`.
+
+# Get via script
+If you'd rather not deal with the hassle of figuring out the proper tarball, downloading it and untarring it, you can use the `get_pdk` script in the OpenLane root directory to automatically download and unpack the prebuilt PDK.
+
+Requires Python3 and click/pyyaml:
+* `python3 -m pip install 'click>7' 'pyyaml'`
+
+```sh
+# Assuming you have ~/bin in PATH
+git clone https://github.com/Cloud-V/sky130-builds
+cd sky130-builds
+make deps
+
+# to install in ~/bin
+make install
+
+# to install in /usr/bin
+sudo make install INSTALL_DIR=/usr/bin
+```
+
+You can then just `get_pdk -v sky130A` or `get_pdk -v sky130B` in your OpenLane or DFFRAM directory.
+
+You can also `get_pdk -S <sky130-commit> -P <open_pdks-commit>` to avoid having to run in one of those directories.
+
+# Get via manual unpacking
 
 This can be done by downloading the tarball then running the following commands:
 
@@ -11,19 +36,6 @@ This can be done by downloading the tarball then running the following commands:
 sudo mkdir -p /usr/local/pdk/sky130A
 sudo chown $USER:$USER /usr/local/pdk/sky130A
 tar -xJf ./sky130A.tar.xz -C /usr/local/pdk/sky130A
-```
-
-# Get PDK Script
-If you'd rather not deal with the hassle of figuring out the proper tarball, you can use the `get_pdk` script in the OpenLane root directory to automatically download and unpack the prebuilt PDK.
-
-Requires Python3 and click/pyyaml:
-* `python3 -m pip install 'click>7' 'pyyaml'`
-
-```sh
-# Assuming you have ~/bin in PATH
-mkdir -p ~/bin 
-curl -L https://raw.githubusercontent.com/Cloud-V/sky130-builds/main/get_pdk > ~/bin/get_pdk
-chmod +x ~/bin/get_pdk
 ```
 
 # License & Acknowledgements
