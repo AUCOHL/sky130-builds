@@ -1,3 +1,6 @@
+sky130-builds is no longer maintained. Consider using [volare](https://github.com/efabless/volare) instead.
+
+---
 # Sky130 Builder
 This repo builds sky130A and sky130B using OpenLane, creates an xzipped tarball, then uploads the results as GitHub release artifacts.
 
